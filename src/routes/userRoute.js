@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addUserHandler,
+  deleteUserHandler,
   getAllUsersHandler,
   getUsersByIdHandler,
   updateUserHandler,
@@ -12,5 +13,6 @@ userRouter.get("/users", getAllUsersHandler);
 userRouter.get("/users/:id", getUsersByIdHandler);
 userRouter.post("/users", addUserHandler);
 userRouter.put("/users/:id", updateUserHandler);
+userRouter.delete("/users/:id", deleteUserHandler);
 
 export default userRouter;

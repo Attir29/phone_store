@@ -9,7 +9,7 @@ export const getAllUsersHandler = async (req, res) => {
     res.status(200).json({
       status: "success",
       data: users,
-      message: "Get all users succesfully",
+      message: "Get all users successfully",
     });
   } catch (error) {
     console.log(error);
@@ -26,7 +26,7 @@ export const getUsersByIdHandler = async (req, res) => {
     );
 
     if (users.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         status: "fail",
         message: "User not found",
       });
@@ -34,7 +34,7 @@ export const getUsersByIdHandler = async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      message: "Get user by id succesfully",
+      message: "Get user by id successfully",
       data: users[0],
     });
   } catch (error) {
@@ -44,47 +44,77 @@ export const getUsersByIdHandler = async (req, res) => {
 };
 
 export const addUserHandler = async (req, res) => {
-  const { fullname, username, email, password, role } = req.body;
+  const {
+    fullname,
+    username,
+    email,
+    password,
+    role,
+    address,
+    phone_number,
+    age,
+  } = req.body;
 
-  if (!fullname || !fullname.trim) {
+  if (!fullname || !fullname.trim()) {
     return res.status(400).json({
       status: "fail",
       message: "Fullname is required",
     });
   }
 
-  if (!username || !username.trim) {
+  if (!username || !username.trim()) {
     return res.status(400).json({
       status: "fail",
-      message: "username is required",
+      message: "Username is required",
     });
   }
 
-  if (!email || !email.trim) {
+  if (!email || !email.trim()) {
     return res.status(400).json({
       status: "fail",
-      message: "email is required",
+      message: "Email is required",
     });
   }
 
-  if (!password || !password.trim) {
+  if (!password || !password.trim()) {
     return res.status(400).json({
       status: "fail",
-      message: "password is required",
+      message: "Password is required",
     });
   }
 
-  if (!role || !role.trim) {
+  if (!role || !role.trim()) {
     return res.status(400).json({
       status: "fail",
-      message: "role is required",
+      message: "Role is required",
+    });
+  }
+
+  if (!address || !address.trim()) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Address is required",
+    });
+  }
+
+  if (!phone_number || !phone_number.trim()) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Phone number is required",
+    });
+  }
+
+  if (!age || !age.toString().trim()) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Age is required",
     });
   }
 
   try {
     const [users] = await pool.query(
-      "INSERT INTO users (fullname, username, email, password, role) VALUES (?,?,?,?,?)",
-      [fullname, username, email, password, role]
+      "INSERT INTO users (fullname, username, email, password, role, address, phone_number, age) VALUES (?,?,?,?,?,?,?,?)",
+      [fullname, username, email, password, role, address, phone_number, age]
     );
 
     const newUser = {
@@ -93,16 +123,11 @@ export const addUserHandler = async (req, res) => {
       username,
       email,
       role,
-      address,
-      phone_number,
-      age,
-      created_at,
-      updated_at,
     };
 
     res.status(201).json({
       status: "success",
-      message: "user created successfully",
+      message: "User created successfully",
       data: newUser,
     });
   } catch (error) {
@@ -119,12 +144,12 @@ export const updateUserHandler = async (req, res) => {
     password,
     role,
     address,
-    phone_nunber,
+    phone_number,
     age,
   } = req.body;
 
   try {
-    const [users] = await pool.query(
+    await pool.query(
       "UPDATE users SET fullname=?, username=?, email=?, password=?, role=?, address=?, phone_number=?, age=? WHERE id=?",
       [
         fullname,
@@ -133,29 +158,55 @@ export const updateUserHandler = async (req, res) => {
         password,
         role,
         address,
-        phone_nunber,
+        phone_number,
         age,
         id,
       ]
     );
 
-    const upadateUser = {
-      id,
-      fullname,
-      username,
-      email,
-      role,
-      address,
-      phone_nunber,
-      age,
-    };
+    const [userUpdate] = await pool.query(
+      "SELECT id, fullname, username, email, role, address, phone_number, age FROM users WHERE id = ?",
+      [id]
+    );
 
     res.status(200).json({
       status: "success",
       message: "User updated successfully",
-      data: upadateUser,
+      data: userUpdate[0],
     });
   } catch (error) {
     console.error(error);
+  }
+};
+
+// ✅ Tambahan: Delete Handler
+export const deleteUserHandler = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [existingUser] = await pool.query(
+      "SELECT id FROM users WHERE id = ?",
+      [id]
+    );
+
+    if (existingUser.length === 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    await pool.query("DELETE FROM users WHERE id = ?", [id]);
+
+    res.status(200).json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
   }
 };
