@@ -43,7 +43,7 @@ export const getUsersByIdHandler = async (req, res) => {
   }
 };
 
-export const addUserHandler = async (req, res) => {
+export const addUsersHandler = async (req, res) => {
   const {
     fullname,
     username,
@@ -135,7 +135,7 @@ export const addUserHandler = async (req, res) => {
   }
 };
 
-export const updateUserHandler = async (req, res) => {
+export const updateUsersHandler = async (req, res) => {
   const { id } = req.params;
   const {
     fullname,
@@ -180,7 +180,7 @@ export const updateUserHandler = async (req, res) => {
 };
 
 // ✅ Tambahan: Delete Handler
-export const deleteUserHandler = async (req, res) => {
+export const deleteUsersHandler = async (req, res) => {
   const { id } = req.params;
 
   try {
