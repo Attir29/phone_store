@@ -31,6 +31,7 @@ export const createUserHandler = async (req, res, next) => {
   try {
     const response = await UserService.createUser(req.body);
 
+    console.log(response);
     res.status(201).json({
       status: "success",
       data: response,
